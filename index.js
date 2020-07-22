@@ -13,15 +13,14 @@
 /** # Create a Server #
 /*  ====================== */
 /** 2) Create a Server */
+// set up app and port
 
 /** # Configure App #
 /*  ====================== */
-/** 3) Create a Server */
+/** 3) Configure Application */
 
 // This part has already been done for you! Just uncomment the lines below.
 
-// const app = express();
-// const port = 3000;
 // app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(fileUpload());
 // const uploadDirectory = __dirname + path.sep + "uploaded";
