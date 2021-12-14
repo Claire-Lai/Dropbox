@@ -24,7 +24,7 @@
 // const uploadDirectory = __dirname + path.sep + "uploaded";
 
 // app.use(express.static("uploaded"));
-// app.use(express.static("public/"));
+// app.use(express.static("public"));
 // let caches = {};
 
 /** # Read File #
