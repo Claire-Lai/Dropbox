@@ -7,13 +7,11 @@
 
 /** # SETUP #
 /*  ================== */
-/** 1) Packages are already installed. Import them to this file */
+/** 1) Packages are already installed. Require them to this file */
 // example: const express = require("express")
+// example: const fs = require("fs")
 
-/** # Create a Server #
-/*  ====================== */
-/** 2) Create a Server */
-// set up app and port
+/** 2) set up app and port */
 
 /** # Configure App #
 /*  ====================== */
@@ -21,7 +19,7 @@
 
 // This part has already been done for you! Just uncomment the lines below.
 
-// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 // app.use(fileUpload());
 // const uploadDirectory = __dirname + path.sep + "uploaded";
 
