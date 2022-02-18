@@ -10,8 +10,22 @@
 /** 1) Packages are already installed. Require them to this file */
 // example: const express = require("express")
 // example: const fs = require("fs")
+const fs = require("fs");
+const path = require("path")
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const { resolveObjectURL } = require("buffer");
+const req = require("express/lib/request");
+const { promiseCallback } = require("express-fileupload/lib/utilities");
+const res = require("express/lib/response");
+//  
+
 
 /** 2) set up app and port */
+const app = express();
+const port = 3000;
+// const uploadedDirectory = __dirname+"/uploaded";
+// let memory = {}
 
 /** # Configure App #
 /*  ====================== */
@@ -19,13 +33,13 @@
 
 // This part has already been done for you! Just uncomment the lines below.
 
-// app.use(express.urlencoded({ extended: false }));
-// app.use(fileUpload());
-// const uploadDirectory = __dirname + path.sep + "uploaded";
+app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload());
+const uploadDirectory = __dirname + path.sep + "uploaded";
 
-// app.use(express.static("uploaded"));
-// app.use(express.static("public"));
-// let caches = {};
+app.use(express.static("uploaded"));
+app.use(express.static("public"));
+let caches = {};
 
 /** # Read File #
 /*  ====================== */
@@ -44,9 +58,14 @@ function readFile(file) {
   console.log("readFile function running");
   console.log("Reading to directory: " + uploadDirectory + "/" + file);
   return new Promise((resolve, reject) => {
-    // CODE BELOW THIS LINE
-    // fs.readFile
-  });
+    fs.readFile(uploadDirectory + path.sep + file, (error, data) => {
+      if (error) {
+        return reject(error);
+      } else {
+        resolve(data);
+      }
+    });
+  })
 }
 
 /** # Write File #
@@ -63,8 +82,14 @@ function writeFile(name, body) {
   console.log("Writing to directory: " + uploadDirectory + "/" + name);
   return new Promise((resolve, reject) => {
     // CODE BELOW THIS LINE
-    // fs.writeFile
-  });
+    fs.writeFileSync(uploadDirectory+"/"+name,body)
+      if(name){
+        resolve(body);
+      }
+      else{
+        reject(res.redirect("/"))
+      }
+    })
 }
 
 /** # GET Method: Render index.html #
@@ -74,6 +99,8 @@ function writeFile(name, body) {
 app.get("/", (req, res) => {
   console.log("GET Method: index.html");
   // CODE BELOW THIS LINE
+  res.sendFile(__dirname+"/pages/index.html")
+  console.log(caches)
 });
 
 /** # POST Method: Upload to /files #
@@ -83,6 +110,15 @@ app.get("/", (req, res) => {
 app.post("/files", (req, res) => {
   console.log("POST Method: " + req.files.upload.name);
   // CODE BELOW THIS LINE
+  if(req.files){
+    const file = req.files.upload;
+    writeFile(file.name,file.data)
+    .then((data)=>caches[file.name]= data)
+    .then((data)=>res.send(`To download, go to http://localhost:${port}/uploaded/${file.name}`))
+  }
+  else{
+    res.redirect("/")
+  }
 });
 
 /** # GET Method: See the file you uploaded #
@@ -92,6 +128,24 @@ app.post("/files", (req, res) => {
 app.get("/uploaded/:name", (req, res) => {
   console.log("GET method: uploaded/:name");
   // CODE BELOW THIS LINE
+  let params = req.params.name;
+  console.log(req.params.name)
+  console.log(caches)
+  if(caches[params]){
+      res.send(caches[params])
+      console.log("Already stored in caches")
+  }
+  else if(fs.existsSync(uploadDirectory+"/"+params)){
+      console.log("Not stored in caches yet")
+      readFile(params)
+      .then((data)=> caches[params]= data)
+      .then(()=>console.log(caches))
+      .then(()=>res.send(caches[params]));
+  }
+
+  else{
+      res.redirect("/");
+  }
 });
 
 /** # Connecting to Server #
